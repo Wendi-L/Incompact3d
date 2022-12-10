@@ -284,7 +284,8 @@ module param
        itype_abl = 10, &
        itype_uniform = 11, &
        itype_sandbox = 12, &
-       itype_cavity = 13
+       itype_cavity = 13, &
+       itype_fsi = 14
 
   integer :: cont_phi,itr,itime,itest,iprocessing
   integer :: ifft,istret,iforc_entree,iturb
@@ -617,6 +618,9 @@ end module simulation_stats
 module ibm_param
   use decomp_2d, only : mytype
   real(mytype) :: cex,cey,cez,ra,ubcx,ubcy,ubcz,rads, c_air
+  real(mytype), save :: dispaccux = 0.0
+  real(mytype), save :: dispaccuy = 0.0
+  real(mytype), save :: dispaccuz = 0.0
   real(mytype) :: chord,thickness,omega
   integer :: inana ! Analytical BC as Input
   integer :: imove

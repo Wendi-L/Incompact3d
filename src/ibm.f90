@@ -977,8 +977,9 @@ subroutine ana_y_cyl(i,y_pos,ana_res)
   real(mytype)                                       :: cexx,ceyy
   !
   if (t.ne.0.) then
-     cexx = cex + ubcx*(t-ifirst*dt)
-     ceyy = cey + ubcy*(t-ifirst*dt)
+
+     cexx = cex + dispaccux
+     ceyy = cey + dispaccuy
   else
      cexx = cex
      ceyy = cey
@@ -1025,7 +1026,7 @@ end subroutine ana_x_cyl
 !*******************************************************************
 SUBROUTINE analitic_x(j,x_pos,ana_res,k)
 
-  USE param, ONLY : itype, itype_cyl
+  USE param, ONLY : itype, itype_cyl, itype_fsi
   USE decomp_2d, ONLY : mytype
 !  USE cyl, ONLY : geomcomplex_cyl
 
@@ -1040,12 +1041,18 @@ SUBROUTINE analitic_x(j,x_pos,ana_res,k)
 
   ENDIF
 
+  IF (itype.EQ.itype_fsi) THEN
+
+     CALL ana_x_cyl(j,x_pos,ana_res)
+
+  ENDIF
+
 END SUBROUTINE analitic_x
 !*******************************************************************
 !*******************************************************************
 SUBROUTINE analitic_y(i,y_pos,ana_res,k)
 
-  USE param, ONLY : itype, itype_cyl
+  USE param, ONLY : itype, itype_cyl, itype_fsi
   USE decomp_2d, ONLY : mytype
 !  USE cyl, ONLY : geomcomplex_cyl
 
@@ -1055,6 +1062,12 @@ SUBROUTINE analitic_y(i,y_pos,ana_res,k)
   real(mytype)                                       :: y_pos,ana_res 
 
   IF (itype.EQ.itype_cyl) THEN
+
+     CALL ana_y_cyl(i,y_pos,ana_res)
+
+  ENDIF
+
+  IF (itype.EQ.itype_fsi) THEN
 
      CALL ana_y_cyl(i,y_pos,ana_res)
 

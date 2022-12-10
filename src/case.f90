@@ -11,6 +11,7 @@ module case
   use user_sim
   use tgv
   use cyl
+  use fsi
   use hill
   use dbg_schemes
   use channel
@@ -82,6 +83,10 @@ contains
     elseif (itype.eq.itype_cyl) then
 
        call init_cyl (ux1, uy1, uz1, phi1)
+
+    elseif (itype.eq.itype_fsi) then
+
+       call init_fsi (ux1, uy1, uz1, phi1)
 
     elseif (itype.eq.itype_dbg) then
 
@@ -174,6 +179,10 @@ contains
     elseif (itype.eq.itype_cyl) then
 
        call boundary_conditions_cyl (ux, uy, uz, phi)
+
+    elseif (itype.eq.itype_fsi) then
+
+       call boundary_conditions_fsi (ux, uy, uz, phi)
 
     elseif (itype.eq.itype_dbg) then
 
@@ -324,6 +333,10 @@ contains
 
        call postprocess_cyl (ux, uy, uz, ep)
 
+    elseif (itype.eq.itype_fsi) then
+
+       call postprocess_fsi (ux, uy, uz, ep)
+
     elseif (itype.eq.itype_dbg) then
 
        call postprocess_dbg (ux, uy, uz, phi, ep)
@@ -383,6 +396,10 @@ contains
 
        call visu_cyl_init(case_visu_init)
 
+    else if (itype .eq. itype_fsi) then
+
+       call visu_fsi_init(case_visu_init)
+
     else if (itype .eq. itype_tbl) then
 
        call visu_tbl_init(case_visu_init)
@@ -437,6 +454,11 @@ contains
     elseif (itype.eq.itype_cyl) then
 
        call visu_cyl(ux1, uy1, uz1, pp3, phi1, ep1, num)
+       called_visu = .true.
+
+    elseif (itype.eq.itype_fsi) then
+
+       call visu_fsi(ux1, uy1, uz1, pp3, phi1, ep1, num)
        called_visu = .true.
 
     elseif (itype.eq.itype_tbl) then

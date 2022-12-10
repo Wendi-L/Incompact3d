@@ -16,6 +16,7 @@ program xcompact3d
   use ibm_param
   use ibm, only : body
   use genepsi, only : genepsi3d
+  use dbg_schemes, only: cos_prec, sin_prec
 
   implicit none
 
@@ -26,6 +27,11 @@ program xcompact3d
      !t=itime*dt
      t=t0 + (itime0 + itime + 1 - ifirst)*dt
      call simu_stats(2)
+
+     ubcx = 2*pi*0.025*0.5*cos_prec(2*pi*0.025*(t-ifirst*dt))
+     ubcy = -2*pi*0.025*0.5*sin_prec(2*pi*0.025*(t-ifirst*dt))
+     dispaccux = dispaccux + (ubcx * dt)
+     dispaccuy = dispaccuy + (ubcy * dt)
 
      if (iturbine.ne.0) call compute_turbines(ux1, uy1, uz1)
 
@@ -261,6 +267,11 @@ subroutine init_xcompact3d()
         open(38,file='forces.dat',form='formatted')
      endif
   endif
+  if (itype==14) then
+     if(nrank.eq.0)then
+        open(38,file='forces.dat',form='formatted')
+     endif
+  endif
 
 endsubroutine init_xcompact3d
 !########################################################################
@@ -287,6 +298,11 @@ subroutine finalise_xcompact3d()
      endif
   endif
   if (itype==5) then
+     if(nrank.eq.0)then
+        close(38)
+     endif
+  endif
+  if (itype==14) then
      if(nrank.eq.0)then
         close(38)
      endif

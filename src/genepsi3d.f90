@@ -45,9 +45,10 @@ contains
 !############################################################################
   subroutine geomcomplex(epsi, nxi, nxf, ny, nyi, nyf, nzi, nzf, dx, yp, dz, remp)
 
-    USE param, ONLY : itype, itype_cyl, itype_hill, itype_channel,itype_sandbox
+    USE param, ONLY : itype, itype_cyl, itype_fsi, itype_hill, itype_channel,itype_sandbox
     USE decomp_2d, ONLY : mytype
     USE cyl, ONLY : geomcomplex_cyl
+    USE fsi, ONLY : geomcomplex_fsi
     USE hill, ONLY : geomcomplex_hill
     USE channel, ONLY : geomcomplex_channel
     USE sandbox, ONLY : geomcomplex_sandbox
@@ -63,6 +64,10 @@ contains
     IF (itype.EQ.itype_cyl) THEN
 
        CALL geomcomplex_cyl(epsi, nxi, nxf, ny, nyi, nyf, nzi, nzf, dx, yp, remp)
+
+    ELSEIF (itype.EQ.itype_fsi) THEN
+
+       CALL geomcomplex_fsi(epsi, nxi, nxf, ny, nyi, nyf, nzi, nzf, dx, yp, remp)
 
     ELSEIF (itype.EQ.itype_hill) THEN
 
@@ -135,9 +140,9 @@ contains
       call verif_epsi(ep1,npif,izap,nx,ny,nz,nobjmax,&
            nxipif,nxfpif,nyipif,nyfpif,nzipif,nzfpif)
     endif
-    ! call geomcomplex_io(nx,ny,nz,ep1,nobjx,nobjy,nobjz,xi,xf,yi,yf,zi,zf,&
-    !      nxipif,nxfpif,nyipif,nyfpif,nzipif,nzfpif,nobjmax,npif,.false.)
-    !
+!    call geomcomplex_io(nx,ny,nz,ep1,nobjx,nobjy,nobjz,xi,xf,yi,yf,zi,zf,&
+!       nxipif,nxfpif,nyipif,nyfpif,nzipif,nzfpif,nobjmax,npif,.false.)
+
   end subroutine genepsi3d
 !
 !############################################################################
@@ -762,6 +767,7 @@ contains
        nxipif,nxfpif,nyipif,nyfpif,nzipif,nzfpif,nobjmax,npif,read_flag)
     use decomp_2d
     USE decomp_2d_io
+    USE param, only : itime
     implicit none
     !
     logical, intent(in) :: read_flag
@@ -785,9 +791,10 @@ contains
       if (nrank==0) print *,'Reading geometry'
       call decomp_2d_read_one(1,ep1,'data/geometry','epsilon.bin',io_geom)   
     else
-      if (nrank==0) print *,'Writing geometry'
+      if (nrank==0) print *,'Writing geometry at '
       call decomp_2d_write_one(1,ep1,'data/geometry','epsilon.bin',0,io_geom)
     endif
+
     !###################################################################
     !x-pencil
     open(67,file='data/geometry/nobjx.dat',form='formatted',access='direct',recl=13)
@@ -922,5 +929,12 @@ contains
     close(67)
     return
   end subroutine geomcomplex_io
+
+  function int_to_str(i)
+    integer, intent(in) :: i
+    character(len=(1 + int(log10(real(i))))) :: int_to_str
+
+    write(int_to_str, "(I0)") i
+  end function int_to_str
   !############################################################################
 end module genepsi

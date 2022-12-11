@@ -28,8 +28,8 @@ program xcompact3d
      t=t0 + (itime0 + itime + 1 - ifirst)*dt
      call simu_stats(2)
 
-     ubcx = 2*pi*0.025*0.5*cos_prec(2*pi*0.025*(t-ifirst*dt))
-     ubcy = -2*pi*0.025*0.5*sin_prec(2*pi*0.025*(t-ifirst*dt))
+     ubcx = 2*pi*cylfx*cylampx*cos_prec(2*pi*cylfx*(t-ifirst*dt))
+     ubcy = 2*pi*cylfy*cylampy*sin_prec(2*pi*cylfy*(t-ifirst*dt))
      dispaccux = dispaccux + (ubcx * dt)
      dispaccuy = dispaccuy + (ubcy * dt)
 

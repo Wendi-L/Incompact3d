@@ -124,10 +124,14 @@ SmagWallDamp = 1      ! Smagorinsky damping function for ABL if 1
 &ibmstuff
 !================
  imove = 1      ! (0: Stationary Objects, 1: Moving Objects)
- ubcx=-0.5      ! Prescribed Velocity (ux)
+ ubcx=0.0      ! Prescribed Velocity (ux)
  ubcy=0.0       ! Prescribed Velocity (uy)
  ubcz=0.0       ! Prescribed Velocity (uz)
-
+ cylfx=0.05      ! Prescribed oscillation frequency
+ cylfy=0.025      ! Prescribed oscillation frequency
+ cylampx=0.5    ! Prescribed oscillation amplitude
+ cylampy=1.0    ! Prescribed oscillation amplitude
+ 
  cex=10.        ! when simulating a cylinder x coordinate of the center
  cey=10.        ! when simulating a cylinder y coordinate of the center
  ra=0.5         ! when simulating a cylinder, radius

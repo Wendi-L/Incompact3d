@@ -77,6 +77,103 @@ contains
   end subroutine body
   !############################################################################
   !############################################################################
+ subroutine rotationZ(ux1,uy1,uz1,ep1)
+    use param, only : zero, dx, dy, dz, istret
+    use decomp_2d
+    !use decomp_2d_io
+    use variables, only : ny
+    use ibm_param
+    use complex_geometry
+    implicit none
+    real(mytype),dimension(xsize(1),xsize(2),xsize(3)) :: ux1,uy1,uz1,ep1,xcoord,ycoord,zcoord
+    real(mytype),dimension(ysize(1),ysize(2),ysize(3)) :: ux2,uy2,uz2
+    real(mytype),dimension(zsize(1),zsize(2),zsize(3)) :: ux3,uy3,uz3
+    integer :: i,j,k
+    real(mytype) :: rotationcenterx, rotationcentery, rotationcenterz
+    real(mytype),dimension(ysize(1),ysize(2),ysize(3)) :: ep2
+    real(mytype),dimension(zsize(1),zsize(2),zsize(3)) :: ep3
+
+    rotationcenterx = cex+dispaccux
+    rotationcentery = cey+dispaccuy
+    rotationcenterz = cez
+
+#ifdef DEBG
+    if (nrank  ==  0) write(*,*) '# body rotation start'
+#endif
+
+    !x-pencil
+    do k = 2, (xsize(3)-1)
+      do j = 2, (xsize(2)-1)
+         do i = 2, (xsize(1)-1)
+            if ((ep1(i,j,k) - ep1((i-1),j,k) == zero) .and. &
+                (ep1(i,j,k) - ep1((i+1),j,k) == zero) .and. &
+                (ep1(i,j,k) - ep1(i,(j-1),k) == zero) .and. &
+                (ep1(i,j,k) - ep1(i,(j+1),k) == zero) .and. &
+                (ep1(i,j,k) - ep1(i,j,(k-1)) == zero) .and. &
+                (ep1(i,j,k) - ep1(i,j,(k+1)) == zero)) then
+               ! non-boundary element. Do nothing.
+            else
+               ! x-position
+               xcoord(i,j,k) = real(i-1,mytype)*dx
+               ! y-boundary velocity correction
+               uy1(i,j,k)= uy1(i,j,k) + (xcoord(i,j,k)-rotationcenterx) * cylomegaz
+            endif
+         enddo
+      enddo
+    enddo
+
+    !y-pencil
+    call transpose_x_to_y(ux1,ux2)
+    call transpose_x_to_y(uy1,uy2)
+    call transpose_x_to_y(uz1,uz2)
+    do k=2,(ysize(3)-1)
+       do j=2,(ysize(2)-1)
+         do i = 2, (ysize(1)-1)
+            if ((ep2(i,j,k) - ep2((i-1),j,k) == zero) .and. &
+                (ep2(i,j,k) - ep2((i+1),j,k) == zero) .and. &
+                (ep2(i,j,k) - ep2(i,(j-1),k) == zero) .and. &
+                (ep2(i,j,k) - ep2(i,(j+1),k) == zero) .and. &
+                (ep2(i,j,k) - ep2(i,j,(k-1)) == zero) .and. &
+                (ep2(i,j,k) - ep2(i,j,(k+1)) == zero)) then
+               ! non-boundary element. Do nothing.
+            else
+               ! y-position
+               if (istret.eq.0) then
+                   ycoord(i,j,k) = real(j-1,mytype)*dy
+               else
+                   write(*,*) "non-zero istret is not support yet - see ibm.f90"
+                   stop
+               endif
+               ! x-boundary velocity correction
+               ux2(i,j,k)= ux2(i,j,k) - (ycoord(i,j,k)-rotationcentery) * cylomegaz
+            endif
+         enddo
+      enddo
+    enddo
+
+    !z-pencil
+    call transpose_y_to_z(ux2,ux3)
+    call transpose_y_to_z(uy2,uy3)
+    call transpose_y_to_z(uz2,uz3)
+
+    !y-pencil
+    call transpose_z_to_y(ux3,ux2)
+    call transpose_z_to_y(uy3,uy2)
+    call transpose_z_to_y(uz3,uz2)
+
+    !x-pencil
+    call transpose_y_to_x(ux2,ux1)
+    call transpose_y_to_x(uy2,uy1)
+    call transpose_y_to_x(uz2,uz1)
+
+#ifdef DEBG
+    if (nrank  ==  0) write(*,*) '# body rotation done'
+#endif
+
+    return
+  end subroutine rotationZ
+  !############################################################################
+  !############################################################################
   subroutine lagpolx(u)
     !
     USE param

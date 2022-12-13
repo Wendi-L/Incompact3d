@@ -14,7 +14,7 @@ program xcompact3d
   use tools, only : restart, simu_stats, apply_spatial_filter, read_inflow
   use turbine, only : compute_turbines
   use ibm_param
-  use ibm, only : body
+  use ibm, only : body, rotationZ
   use genepsi, only : genepsi3d
   use dbg_schemes, only: cos_prec, sin_prec
 
@@ -52,6 +52,7 @@ program xcompact3d
         if (imove.eq.1) then ! update epsi for moving objects
           if ((iibm.eq.2).or.(iibm.eq.3)) then
              call genepsi3d(ep1)
+             call rotationZ(ux1,uy1,uz1,ep1)
           else if (iibm.eq.1) then
              call body(ux1,uy1,uz1,ep1)
           endif
@@ -127,7 +128,7 @@ subroutine init_xcompact3d()
   use visu, only : visu_init, visu_ready
 
   use genepsi, only : genepsi3d, epsi_init
-  use ibm, only : body
+  use ibm, only : body, rotationZ
 
   use probes, only : init_probes
 
@@ -199,6 +200,7 @@ subroutine init_xcompact3d()
 
   if ((iibm.eq.2).or.(iibm.eq.3)) then
      call genepsi3d(ep1)
+     call rotationZ(ux1,uy1,uz1,ep1)
   else if (iibm.eq.1) then
      call epsi_init(ep1)
      call body(ux1,uy1,uz1,ep1)
@@ -240,6 +242,7 @@ subroutine init_xcompact3d()
 
   if ((iibm.eq.2).or.(iibm.eq.3)) then
      call genepsi3d(ep1)
+     call rotationZ(ux1,uy1,uz1,ep1)
   else if ((iibm.eq.1).or.(iibm.eq.3)) then
      call body(ux1,uy1,uz1,ep1)
   endif

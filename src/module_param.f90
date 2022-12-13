@@ -618,6 +618,7 @@ end module simulation_stats
 module ibm_param
   use decomp_2d, only : mytype
   real(mytype) :: cex,cey,cez,ra,ubcx,ubcy,ubcz,rads, c_air, cylfx, cylfy, cylampx, cylampy
+  real(mytype) :: cylomegax, cylomegay, cylomegaz
   real(mytype), save :: dispaccux = 0.0
   real(mytype), save :: dispaccuy = 0.0
   real(mytype), save :: dispaccuz = 0.0
